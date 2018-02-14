@@ -12,7 +12,7 @@ contract QEth {
   }
 
   function verify_chunk(byte v, bytes32 s) internal returns (bytes32 y) {
-    for(uint i = 0; i < 255 - uint(v); i++){
+    for(uint i = 0; i < 256 - uint(v); i++){
       s = sha3(s);
     }
     return s;
@@ -21,13 +21,15 @@ contract QEth {
   function verify_message(bytes32 message, bytes32[32] sig) internal {
     uint s;
     bytes32 phash;
-    for(uint i = 0; i < 32; i++){
-      phash = keccak256(pubkey_hash, verify_chunk(message[i], sig[i]));
-      if (i < 30){
-        s += uint(message[i]);
-      }
+    for(uint i = 0; i < 30; i++){
+      s += uint(message[i]);
     }
-    assert(256*30 - s == uint(message & 0xFFFF)); // Make sure checksum is valid
+
+    message &= 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000;
+    message |= bytes32(256*30 - s);
+    for(i = 0; i < 32; i++){
+      phash = keccak256(phash, verify_chunk(message[i], sig[i]));
+    }
     assert(phash == pubkey_hash);
   }
 

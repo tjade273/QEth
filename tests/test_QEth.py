@@ -20,7 +20,6 @@ def sign(privkey, nextkey, gas, addr, value, data):
     h = list(eth_utils.keccak(msg))[:-2]
     checksum = 256*30 - sum(h)
     msg_hash = h+[checksum >> 8, checksum & 0xFF]
-    print(bytes(msg_hash))
     return [hash(privkey[i], msg_hash[i]) for i in range(32)]
 
 init_key = keygen()
@@ -36,10 +35,12 @@ def qeth_contract(chain):
 def test_deploy(qeth_contract):
     assert eth_utils.force_bytes(qeth_contract.call().pubkey_hash()) == init_key[0]
 
-def test_sign(qeth_contract):
+def test_sign(qeth_contract, web3, capsys):
     (pubkey_next, privkey_next) = keygen()
     sig = sign(init_key[1], pubkey_next, b'\x00', b'\x00', b'\x00', b'')
-    qeth_contract.transact().send_transaction(sig, pubkey_next, 0, "0x"+"0"*40, 0, b'')
+    tx_hash = qeth_contract.transact().send_transaction(sig, pubkey_next, 0, "0x"+"0"*40, 0, b'')
+    with capsys.disabled():
+        print('\nGas used:'+str(+web3.eth.getTransactionReceipt(tx_hash)['gasUsed'])+'\n')
     assert eth_utils.force_bytes(qeth_contract.call().pubkey_hash()) == pubkey_next
 
 

@@ -65,3 +65,5 @@ typings/
 
 __pycache__
 *.pyc
+
+build

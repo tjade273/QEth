@@ -1,0 +1,67 @@
+(def 'pubkey_hash_abi 0xcb3b0aae)
+(def 'send_transaction_abi 0x46c436a3)
+(perm 'pubkey_hash)
+(def 'function (function-hash code-body)
+    (when (= (shr $0 224) function-hash)
+      code-body))
+
+(def 'i 0x40)
+(def 'sig 0x20)
+(def 'phash 0x0)
+
+; verify_chunk takes a value v and an index into calldata and returns a stack value
+(def 'verify_chunk (v sigi)
+     (seq
+         [sig]:$sigi
+         (for i:[0] (< @i (- 256 v)) [i]:(+ @i 1) [sig]:(keccak sig 32))
+         [phash]:(keccak phash 64)
+      )
+)
+
+(def 'msg_hash (seq
+     (calldatacopy 0 4 0x440)
+     (calldatacopy 0x440 0x450 52)
+     (calldatacopy 0x474 0x4c4 $(0x4a4))
+     (keccak 0 (+ 0x474 $(0x4a4)))
+))
+(returnlll
+(seq
+  (function pubkey_hash_abi (return pubkey_hash))
+  (function send_transaction_abi (seq
+            [phash]:0
+            (with 'msghash msg_hash
+              (seq
+                (verify_chunk (byte 0 msghash) 0x04)
+                (verify_chunk (byte 1 msghash) 0x24)
+                (verify_chunk (byte 2 msghash) 0x44)
+                (verify_chunk (byte 3 msghash) 0x64)
+                (verify_chunk (byte 4 msghash) 0x84)
+                (verify_chunk (byte 5 msghash) 0xa4)
+                (verify_chunk (byte 6 msghash) 0xc4)
+                (verify_chunk (byte 7 msghash) 0xe4)
+                (verify_chunk (byte 8 msghash) 0x104)
+                (verify_chunk (byte 9 msghash) 0x124)
+                (verify_chunk (byte 10 msghash) 0x144)
+                (verify_chunk (byte 11 msghash) 0x164)
+                (verify_chunk (byte 12 msghash) 0x184)
+                (verify_chunk (byte 13 msghash) 0x1a4)
+                (verify_chunk (byte 14 msghash) 0x1c4)
+                (verify_chunk (byte 15 msghash) 0x1e4)
+                (verify_chunk (byte 0 msghash) 0x04)
+                (verify_chunk (byte 1 msghash) 0x24)
+                (verify_chunk (byte 2 msghash) 0x44)
+                (verify_chunk (byte 3 msghash) 0x64)
+                (verify_chunk (byte 4 msghash) 0x84)
+                (verify_chunk (byte 5 msghash) 0xa4)
+                (verify_chunk (byte 6 msghash) 0xc4)
+                (verify_chunk (byte 7 msghash) 0xe4)
+                (verify_chunk (byte 8 msghash) 0x104)
+                (verify_chunk (byte 9 msghash) 0x124)
+                (verify_chunk (byte 10 msghash) 0x144)
+                (verify_chunk (byte 11 msghash) 0x164)
+                (verify_chunk (byte 12 msghash) 0x184)
+                (verify_chunk (byte 13 msghash) 0x1a4)
+                (verify_chunk (byte 14 msghash) 0x1c4)
+                (verify_chunk (byte 15 msghash) 0x1e4)
+                )
+))))

@@ -15,6 +15,7 @@ contract QEth {
     pubkey_hash = _pubkey;
   }
 
+  // Naieve solidity version (~1.5 M gas)
   function send_transaction(bytes32[32] sig, bytes32 next_key, uint g, address a, uint v, bytes data) external {
 
     uint s; // \sum_{i = 0}^30 message_i
@@ -46,7 +47,7 @@ contract QEth {
     pubkey_hash = next_key;
   }
 
-  // Optimized assembly version
+  // Optimized assembly version (~600k gas)
   function send_asm(bytes32[32] sig, bytes32 next_key, uint g, address a, uint v, bytes data) external {
     assembly{
         let s := 0

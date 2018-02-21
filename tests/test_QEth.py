@@ -39,18 +39,22 @@ def qeth_contract(chain):
 def test_deploy(qeth_contract):
     assert eth_utils.force_bytes(qeth_contract.call().pubkey_hash()) == init_key[0]
 
-def test_sign(qeth_contract, web3, capsys):
+def test_assembly(qeth_contract, web3, capsys):
     (pubkey_next, privkey_next) = keygen()
     msghash = msg_hash(pubkey_next, b'\x00', b'\x00', b'\x00', b'\x12\x34')
     sig = sign(init_key[1], msghash)
     tx_hash1 = qeth_contract.transact().send_asm(sig, pubkey_next, 0, "0x"+"0"*40, 0, b'\x12\x34')
-    #tx_hash2 = qeth_contract.transact().send_transaction(sig, pubkey_next, 0, "0x"+"0"*40, 0, b'\x12\x34')
-    #print("Logged msg: ",web3.eth.getTransactionReceipt(tx_hash)['logs'][0]['data'], len(web3.eth.getTransactionReceipt(tx_hash)['logs'][0]['data']))
-    #assert (web3.eth.getTransactionReceipt(tx_hash1)['logs'][1]['data'] == "0x"+msghash.hex())
-    #assert web3.eth.getTransactionReceipt(tx_hash1)['logs'][2]['data'] == web3.eth.getTransactionReceipt(tx_hash2)['logs'][0]['data'] 
     with capsys.disabled():
-        print('\nGas used:'+str(+web3.eth.getTransactionReceipt(tx_hash1)['gasUsed'])+'\n')
+        print('\nASM Gas used:'+str(+web3.eth.getTransactionReceipt(tx_hash1)['gasUsed'])+'\n')
     assert eth_utils.force_bytes(qeth_contract.call().pubkey_hash()) == pubkey_next
 
+def test_send(qeth_contract, web3, capsys):
+    (pubkey_next, privkey_next) = keygen()
+    msghash = msg_hash(pubkey_next, b'\x00', b'\x00', b'\x00', b'\x12\x34')
+    sig = sign(init_key[1], msghash)
+    tx_hash1 = qeth_contract.transact().send_transaction(sig, pubkey_next, 0, "0x"+"0"*40, 0, b'\x12\x34')
+    with capsys.disabled():
+        print('\nSOL Gas used:'+str(+web3.eth.getTransactionReceipt(tx_hash1)['gasUsed'])+'\n')
+    assert eth_utils.force_bytes(qeth_contract.call().pubkey_hash()) == pubkey_next
 
 

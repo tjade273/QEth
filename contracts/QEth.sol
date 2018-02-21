@@ -68,6 +68,7 @@ contract QEth {
             }
         mstore(0, keccak256(0, 64))
         }
+        // Calculate pubkey for checksum chunks
         s := sub(7680, s)
         mstore(32, calldataload(964))
         for {let j := 0} lt(j, sub(256, div(s, 256))) {j := add(j, 1)}
@@ -82,7 +83,7 @@ contract QEth {
         }
         let pubkey := keccak256(0, 64)
         if iszero(eq(pubkey, sload(pubkey_hash_slot))) {
-            return(0,0)
+            revert(0,0)
         }
         call(g, a, v, add(m, 1112), l, 0,0)
         pop

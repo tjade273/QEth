@@ -1,5 +1,8 @@
 # QEth
-Quantum Safe ERC20 token with Winternitz One-Time signatures
+Quantum Safe Ethereum proxy with Winternitz One-Time signatures
+
+Acts as a proxy, storing ETH and sending it along with arbitrary data upon receipt of a valid Winternitz signature.
+Hash based, so not vulnerable to Shor's algorithm
 
 # Requirements:
     pip install populus eth-utils
